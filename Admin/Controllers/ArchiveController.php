@@ -10,11 +10,16 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Request;
 
+use App\Http\Controllers\Controller;
+
+/**
+ * 文章管理
+ */
 class ArchiveController extends Controller
 {
     use ModelForm;

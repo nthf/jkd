@@ -2,17 +2,19 @@
 
 namespace Jkd\Admin\Controllers;
 
+use Jkd\Models\Topic;
+use Jkd\Models\Arctype;
+
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
-use Illuminate\Support\MessageBag;
 
-use Jkd\Models\Topic;
-use Jkd\Models\Arctype;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Request;
+
+use App\Http\Controllers\Controller;
 
 /**
  * 专题相关的控制器

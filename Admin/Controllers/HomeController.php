@@ -19,6 +19,9 @@ use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Widgets\Tab;
 use Encore\Admin\Widgets\Table;
 
+/**
+ * 后台默认页
+ */
 class HomeController extends Controller
 {
     public function index()

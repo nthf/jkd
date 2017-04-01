@@ -3,7 +3,6 @@
 namespace Jkd\Admin\Controllers;
 
 use Jkd\Models\Arctype;
-use App\Http\Controllers\Controller;
 
 use Encore\Admin\Form;
 use Encore\Admin\Facades\Admin;
@@ -19,6 +18,11 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 
+use App\Http\Controllers\Controller;
+
+/**
+ * 栏目管理
+ */
 class ArctypeController extends Controller
 {
     use ModelForm;

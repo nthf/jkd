@@ -12,6 +12,9 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\ModelForm;
 
+/**
+ * 武器管理
+ */
 class WuqiController extends Controller
 {
     use ModelForm;

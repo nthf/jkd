@@ -6,6 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * 模版的服务提供
+ */
 class TemplateServiceProvider extends ServiceProvider
 {
     /**
@@ -15,22 +18,58 @@ class TemplateServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // 引导加载模版视图的目录
+        $this->bootLoadView();
+        
+        // 引导自定义的模版视图扩展标签
+        $this->bootBlade();
+    }
 
-        /*
-         * 随机调取内容
-         *
-         *
-         *
-         * **/
+    /**
+     * Register the application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
+    
+    /**
+     * 引导-模版视图的加载目录
+     */
+    protected function bootLoadView()
+    {
+        $domain = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
+        $isMobileDomain = is_string($domain) && 0 === strpos($domain, 'm.');
+        // 设置模版目录
+        if ($isMobileDomain) { // 手机版
+            $this->loadViewsFrom(resource_path('themes/mobile'), 'themes');
+        } else { // 电脑版
+            $this->loadViewsFrom(resource_path('themes/pc'), 'themes');
+        }
+        // 设置后台视图目录
+        $this->loadViewsFrom(resource_path('views/admin'), 'admin');
+    }
+    
+    /**
+     * 引导-自定义的扩展标签
+     */
+    protected function bootBlade()
+    {
+        /**
+         * 随机调取内容 
+         */
         Blade::directive('suiji', function($args){
-            $query = null;
+            $output = null;
+            
             do {
                 /* 处理接收的参数 */
                 $args = explode(',', $args);
                 if (count($args) < 3) {
+                    $output = '<?php ob_start(); \$renderType=null; \$suiji=null; ?>';
                     break;
                 }
-
 
                 if ($args[0] === '标签') {
                     $renderType = '"tag"';
@@ -38,41 +77,41 @@ class TemplateServiceProvider extends ServiceProvider
                     $renderType = '"liebiao"';
                 }
 
-                $preStr = "<?php ob_start(); \$renderType = {$renderType};";
+                $output = "<?php ob_start(); \$renderType = {$renderType};";
 
                 /* 所有 */
                 if ($args[0] === '所有') {
-                    return $preStr . " \$suiji = getRandom('archives',['arcrank'=>'0'],{$args[1]},{$args[2]}); ?>";
+                    $output .= " \$suiji = getRandom('archives',['arcrank'=>'0'],{$args[1]},{$args[2]}); ?>";
                     break;
                 }
 
                 /* 视频 */
                 if ($args[0] === '视频') {
-                    return $preStr . " \$suiji = getRandom('archives',['show'=>'3','arcrank'=>'0'],{$args[1]},{$args[2]}); ?>";
+                    $output .= " \$suiji = getRandom('archives',['show'=>'3','arcrank'=>'0'],{$args[1]},{$args[2]}); ?>";
                     break;
                 }
 
                 /* 图片 */
                 if ($args[0] === '图片') {
-                    return $preStr . " \$suiji = getRandom('archives',['show'=>'2','arcrank'=>'0'],{$args[1]},{$args[2]}); ?>";
+                    $output .= " \$suiji = getRandom('archives',['show'=>'2','arcrank'=>'0'],{$args[1]},{$args[2]}); ?>";
                     break;
                 }
 
                 /* 文章 */
                 if ($args[0] === '文章') {
-                    return $preStr . " \$suiji = getRandom('archives',['show'=>'1','arcrank'=>'0'],{$args[1]},{$args[2]}); ?>";
+                    $output .= " \$suiji = getRandom('archives',['show'=>'1','arcrank'=>'0'],{$args[1]},{$args[2]}); ?>";
                     break;
                 }
 
                 /* 标签 */
                 if ($args[0] === '标签') {
-                    return $preStr . " \$suiji = getRandom('tags',[],{$args[1]},{$args[2]}); ?>";
+                    $output .= " \$suiji = getRandom('tags',[],{$args[1]},{$args[2]}); ?>";
                     break;
                 }
-
             }
             while (false);
-
+            
+            return $output;
         });
         Blade::directive('endsuiji', function() {
             return '<?php $html = ob_get_contents(); $html = renderTpl($suiji,$html,$renderType); ob_end_clean(); echo $html; ?>';
@@ -89,10 +128,6 @@ class TemplateServiceProvider extends ServiceProvider
          * <pre>
          *    @liebiao(1,0,10)
          *    @liebiao(资讯,0,10,news)
-         *    @liebiao(资讯,0,10,news2)
-         *    @liebiao(资讯,0,10,news3)
-         *    @liebiao(视频,0,10,video)
-         *    @liebiao(壁纸,0,10,wallpaper)
          *    @liebiao(14|15|16,0,10,news)
          * </pre>
          */
@@ -210,18 +245,11 @@ class TemplateServiceProvider extends ServiceProvider
                     break;
                 }
 
-                /* 取得对应的频道ID */
-                $channel = array_search('专题', config('nizhan.channels'));
-                if (empty($channel)) {
-                    break;
-                }
-                $channel = intval($channel);
-
                 /* 从该频道所有的栏目分类中，查找指定分类名称对应的ID */
                 $typeName = $args[0];
                 $typeId = null;
                 if ($typeName !== '所有') {
-                    $typeList = DB::table('arctypes')->where('channel', $channel)->pluck('type_name', 'id')->toArray();
+                    $typeList = DB::table('arctypes')->where('channel', 2)->pluck('type_name', 'id')->toArray();
                     $typeId = empty($typeList) ? null : array_search($args[0], $typeList);
                 }
 
@@ -317,28 +345,19 @@ class TemplateServiceProvider extends ServiceProvider
          * </pre>
          */
         Blade::directive('tuijian', function($args) {
-            do {
-                /* 处理接收的参数 */
-                $args = explode(',', $args);
-                if (count($args) < 3) {
-                    break;
-                }
-                
-                /* 按条件查询数据库表 */
-                $tuijian = DB::table('archives')->whereRaw('arcrank=0 AND FIND_IN_SET("' . $args[0] .'",flag)')
-                                ->orderBy('id', 'desc')->offset($args[1])->limit($args[2])->get();
-                $tuijian = serialize($tuijian);
+            // 按条件查询数据库表
+            $tuijian = DB::table('archives')->whereRaw('arcrank=0 AND FIND_IN_SET("' . $args[0] .'",flag)')
+                            ->orderBy('id', 'desc')->offset($args[1])->limit($args[2])->get();
+            $tuijian = serialize($tuijian);
 
-                // 获取模版名称
-                if (isset($args[3])) {
-                    $tpl = config('nizhan.recoms')[ $args[0] ];
-                    $template = getView('helpers.tuijian.'.$tpl);
-                    return "<?php \$tuijian = unserialize('{$tuijian}'); ?>"."<?php echo \$__env->make('{$template}', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
-                } else {
-                    return "<?php ob_start(); \$tuijian = unserialize('{$tuijian}'); ?>";
-                }
+            // 获取模版名称
+            if (isset($args[3])) {
+                $tpl = config('data.recoms')[ $args[0] ];
+                $template = getView('helpers.tuijian.'.$tpl);
+                return "<?php \$tuijian = unserialize('{$tuijian}'); ?>"."<?php echo \$__env->make('{$template}', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+            } else {
+                return "<?php ob_start(); \$tuijian = unserialize('{$tuijian}'); ?>";
             }
-            while (false);
         });
         Blade::directive('endtuijian', function($args) {
             return '<?php $html = ob_get_contents(); $html = renderTpl($tuijian,$html,"tuijian"); ob_end_clean(); echo $html; ?>';
@@ -356,23 +375,13 @@ class TemplateServiceProvider extends ServiceProvider
          * </pre>
          */
         Blade::directive('tag', function($args) {
-            do {
-                /* 处理接收的参数 */
-                $args = explode(',', $args);
-                if (count($args) < 3) {
-                    break;
-                }
-                
-                /* 按条件查询数据库表 */
-                if ($args[0] === '随机') {
-                    $tag = DB::table('tags')->orderByRaw('RAND()')->offset($args[1])->limit($args[2])->get();
-                } else {
-                    $tag = DB::table('tags')->orderBy('id', 'DESC')->offset($args[1])->limit($args[2])->get();
-                }
-                $tag = serialize($tag);
-                return "<?php ob_start(); \$tag = unserialize('{$tag}'); ?>";
+            if ($args[0] === '随机') {
+                $tag = DB::table('tags')->orderByRaw('RAND()')->offset($args[1])->limit($args[2])->get();
+            } else {
+                $tag = DB::table('tags')->orderBy('id', 'DESC')->offset($args[1])->limit($args[2])->get();
             }
-            while (false);
+            $tag = serialize($tag);
+            return "<?php ob_start(); \$tag = unserialize('{$tag}'); ?>";
         });
         Blade::directive('endtag', function($args) {
             return '<?php $html = ob_get_contents(); $html = renderTpl($tag,$html,"tag"); ob_end_clean(); echo $html; ?>';
@@ -399,8 +408,8 @@ class TemplateServiceProvider extends ServiceProvider
                     break;
                 }
 
-                $heros = json_decode(config('nizhan.herolist'));
-                $type = config('nizhan.herotype');
+                $heros = json_decode(config('data.herolist'));
+                $type = config('data.herotype');
                 $hero_type = array_search($args[0], $type);
 
                 $yingxiong = [];
@@ -415,7 +424,7 @@ class TemplateServiceProvider extends ServiceProvider
                 }
 
                 if($args[3] == 'hot' || $args[3] == 'new'){
-                    $yingxiong = $heros = json_decode(config('nizhan.hero'.$args[3]));
+                    $yingxiong = $heros = json_decode(config('data.hero'.$args[3]));
                     $typeName = $args[3];
                     $args[3] = 2;
                 }else{
@@ -434,14 +443,5 @@ class TemplateServiceProvider extends ServiceProvider
         });
         
     }
-
-    /**
-     * Register the application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
+    
 }

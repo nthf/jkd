@@ -8,9 +8,13 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Jkd\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 
+use Jkd\Http\Controllers\Controller;
+
+/**
+ * 标签管理
+ */
 class TagController extends Controller
 {
     use ModelForm;
