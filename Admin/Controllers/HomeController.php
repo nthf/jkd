@@ -2,7 +2,7 @@
 
 namespace Jkd\Admin\Controllers;
 
-use Jkd\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;

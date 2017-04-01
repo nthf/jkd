@@ -6,7 +6,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Jkd\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 
 class ExampleController extends Controller

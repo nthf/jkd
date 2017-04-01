@@ -3,7 +3,7 @@
 namespace Jkd\Admin\Controllers;
 
 use Jkd\Models\Arctype;
-use Jkd\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 
 use Encore\Admin\Form;
 use Encore\Admin\Facades\Admin;

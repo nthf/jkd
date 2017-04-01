@@ -1,9 +1,8 @@
 <?php
 
-namespace Jkd\Admin\Controllers;
+namespace App\Admin\Controllers;
 
 use Jkd\Models\Tag;
-use Jkd\Models\Arctype;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

@@ -2,7 +2,7 @@
 
 namespace Jkd\Admin\Controllers;
 
-use Jkd\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 
 /**
  * 清理缓存

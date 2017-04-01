@@ -4,9 +4,9 @@ use Illuminate\Routing\Router;
 
 Route::group([
     'prefix'        => 'admin',
-    'namespace'     => Admin::controllerNamespace(),
+    'namespace'     => 'Jkd\Admin\Controllers',
     'middleware'    => ['web', 'admin'],
-    'domain' => 'admin.nizhan.dev'
+    'domain' => env('ADMIN_DOMIAN'),
 ], function (Router $router) {
     $router->get('/', 'HomeController@index');
     $router->resource('arctypes', ArctypeController::class);
